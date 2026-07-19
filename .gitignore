@@ -1,0 +1,13 @@
+node_modules/
+out/
+*.vsix
+.tmp-vsix/
+.vscode-test/
+.vscode-test-user-data*/
+.vscode-test-extensions*/
+*.log
+logs/
+/CODEX_APP_SERVER_COPILOT_CAPABILITIES_REPORT.md
+/VSCODEX_HARNESS_TOOL_AUDIT.md
+/docs/CLIENT-EXPANSION-PLAN.md
+/editthis.md

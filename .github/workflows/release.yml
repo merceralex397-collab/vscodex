@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*-pre']
+
+permissions:
+  contents: read
+
+env:
+  RELEASE_VERSION: 0.2.1
+  RELEASE_ARTIFACT: vscodex-0.2.1-pre-release.vsix
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        codex: ['0.144.4', latest]
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate tag and identity
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          test "${VERSION}" = "${RELEASE_VERSION}"
+          test "$(node -p "require('./package-lock.json').version")" = "${VERSION}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            test "${GITHUB_REF_NAME}" = "v${VERSION}-pre"
+            git fetch origin main:refs/remotes/origin/main
+            git merge-base --is-ancestor "${GITHUB_SHA}" origin/main
+          fi
+      - run: npm run check
+      - run: npm run compile
+      - run: npm run check:notices
+      - run: npm run test:unit
+      - run: npm run test:smoke
+      - run: npm run check:security
+      - run: npm install --global @openai/codex@${{ matrix.codex }}
+      - run: npm run test:app-server
+
+  package:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run package:vsix -- --pre-release --out "${RELEASE_ARTIFACT}"
+      - name: Generate SHA-256 checksum
+        shell: bash
+        run: sha256sum "${RELEASE_ARTIFACT}" > "${RELEASE_ARTIFACT}.sha256"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vscodex-${{ env.RELEASE_VERSION }}-pre-release
+          path: |
+            ${{ env.RELEASE_ARTIFACT }}
+            ${{ env.RELEASE_ARTIFACT }}.sha256
+          retention-days: 30
+
+  extension-host:
+    strategy:
+      fail-fast: false
+      matrix:
+        vscode: ['1.104.0', stable]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run compile
+      - run: xvfb-run -a npm run test:extension-host
+        env:
+          CODEX_TEST_VSCODE_VERSION: ${{ matrix.vscode }}
+
+  publish-github:
+    if: github.ref_type == 'tag'
+    needs: [package, extension-host]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: vscodex-${{ env.RELEASE_VERSION }}-pre-release
+      - name: Create GitHub pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}"
+          "${RELEASE_ARTIFACT}"
+          "${RELEASE_ARTIFACT}.sha256"
+          --repo "${GITHUB_REPOSITORY}"
+          --prerelease
+          --generate-notes
+          --title "vsCodex ${RELEASE_VERSION} pre-release"

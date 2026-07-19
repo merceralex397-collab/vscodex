@@ -1,0 +1,201 @@
+{
+  "name": "vscodex",
+  "displayName": "vsCodex",
+  "description": "Use Codex models in VS Code and GitHub Copilot through the official Codex app-server and your shared ChatGPT login.",
+  "icon": "assets/vscodex.png",
+  "version": "0.2.1",
+  "publisher": "merceralex397-collab",
+  "author": "merceralex397-collab",
+  "license": "MIT",
+  "private": true,
+  "homepage": "https://github.com/merceralex397-collab/vscodex#readme",
+  "bugs": {
+    "url": "https://github.com/merceralex397-collab/vscodex/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/merceralex397-collab/vscodex.git"
+  },
+  "keywords": [
+    "codex",
+    "chatgpt",
+    "copilot",
+    "language-model",
+    "ai"
+  ],
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "activationEvents": [
+    "onLanguageModelChatProvider:vscodex",
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "check": "tsc -p ./ --noEmit",
+    "compile": "npm run check && node esbuild.mjs",
+    "generate:notices": "node scripts/generateThirdPartyNotices.mjs",
+    "check:notices": "node scripts/generateThirdPartyNotices.mjs --check",
+    "check:security": "node scripts/checkPackageSecurity.mjs",
+    "check:package": "node scripts/checkPackageSecurity.mjs --vsix vscodex-0.2.1-pre-release.vsix",
+    "package:vsix": "node scripts/packageVsix.mjs",
+    "test:unit": "node --test test/unit/*.test.cjs",
+    "test:smoke": "node --test test/smoke/*.test.cjs",
+    "test:extension-host": "node test/runExtensionHostTests.cjs",
+    "test:app-server": "node scripts/checkAppServerLifecycle.mjs",
+    "test:real-app-server": "node test/realAppServerProbe.mjs",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile && npm run check:security"
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.6"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^22.15.30",
+    "@types/vscode": "1.104.0",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.25.5",
+    "typescript": "^5.9.2",
+    "yauzl": "^3.4.0"
+  },
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "vendor": "vscodex",
+        "displayName": "Codex",
+        "managementCommand": "vsCodex.manage"
+      }
+    ],
+    "commands": [
+      {
+        "command": "vsCodex.manage",
+        "title": "Codex: Manage"
+      },
+      {
+        "command": "vsCodex.signInWithChatGPT",
+        "title": "Codex: Sign in with ChatGPT"
+      },
+      {
+        "command": "vsCodex.signInWithDeviceCode",
+        "title": "Codex: Sign in with Device Code"
+      },
+      {
+        "command": "vsCodex.cancelSignIn",
+        "title": "Codex: Cancel Sign-in"
+      },
+      {
+        "command": "vsCodex.showAccountStatus",
+        "title": "Codex: Show Account Status"
+      },
+      {
+        "command": "vsCodex.signOut",
+        "title": "Codex: Sign Out of Codex"
+      },
+      {
+        "command": "vsCodex.checkRuntime",
+        "title": "Codex: Check App-server Runtime"
+      },
+      {
+        "command": "vsCodex.configureUtilityModels",
+        "title": "Codex: Configure VS Code Utility Models"
+      },
+      {
+        "command": "vsCodex.configureReasoningEffort",
+        "title": "Codex: Configure Reasoning Effort"
+      },
+      {
+        "command": "vsCodex.showIntegrationDiagnostics",
+        "title": "Codex: Show Integration Diagnostics"
+      },
+      {
+        "command": "vsCodex.configureExecutable",
+        "title": "Codex: Configure Codex Executable"
+      },
+      {
+        "command": "vsCodex.refreshAccountLimits",
+        "title": "Codex: Refresh Account Limits"
+      },
+      {
+        "command": "vsCodex.openDebugLogs",
+        "title": "Codex: Open Debug Logs"
+      },
+      {
+        "command": "vsCodex.openSettings",
+        "title": "Codex: Open Settings"
+      }
+    ],
+    "configuration": {
+      "title": "vsCodex",
+      "properties": {
+        "vsCodex.appServer.command": {
+          "type": "string",
+          "default": "codex",
+          "scope": "machine",
+          "description": "Codex CLI executable on this extension host. Stable version 0.144.4 or newer is required."
+        },
+        "vsCodex.model": {
+          "type": "string",
+          "default": "gpt-5.5",
+          "description": "Preferred default model when it is present in the app-server model catalog."
+        },
+        "vsCodex.disabledModels": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Discovered model IDs to hide from the model picker.",
+          "tags": [
+            "advanced"
+          ]
+        },
+        "vsCodex.modelAliases": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map obsolete model IDs to discovered replacement model IDs.",
+          "tags": [
+            "advanced"
+          ]
+        },
+        "vsCodex.instructions": {
+          "type": "string",
+          "default": "You are a helpful coding assistant integrated with VS Code.",
+          "description": "Additional developer instructions supplied to each passive Codex thread.",
+          "editPresentation": "multilineText"
+        },
+        "vsCodex.defaultServiceTier": {
+          "type": "string",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "default",
+            "fast"
+          ],
+          "enumDescriptions": [
+            "Use the selected model's advertised default service tier.",
+            "Prefer the standard service tier when the model advertises it.",
+            "Prefer the fast service tier when the model advertises it."
+          ],
+          "description": "Preferred service tier. Unsupported tiers are omitted for the selected model."
+        },
+        "vsCodex.defaultReasoningEffort": {
+          "type": "string",
+          "default": "auto",
+          "description": "Default reasoning mode. Use `auto` or an identifier advertised by the live Codex model catalog. Run “Codex: Configure Reasoning Effort” for catalog-driven choices; unsupported modes are ignored for the selected model."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+name: Bug report
+description: Report a reproducible problem in vsCodex.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, prompts, tool data, authentication URLs, email addresses, or private paths.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Provide vsCodex, VS Code, and Codex CLI versions.
+      placeholder: vsCodex 0.2.1-pre; VS Code 1.x; codex-cli 0.x
+    validations:
+      required: true
+  - type: dropdown
+    id: host
+    attributes:
+      label: Extension host
+      options:
+        - Local desktop
+        - Remote SSH
+        - WSL
+        - Dev container
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the observed and expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide safe steps that do not expose private data.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostics
+      description: Include only privacy-safe structural diagnostics.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed credentials, prompts, tool data, authentication URLs, email addresses, and private paths.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true
