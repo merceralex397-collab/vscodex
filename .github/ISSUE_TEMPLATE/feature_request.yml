@@ -1,0 +1,34 @@
+name: Feature request
+description: Propose a focused improvement to CodexVS.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Trust-boundary impact
+      description: Explain any effect on authentication, MCP, tools, workspace access, permissions, logging, or packaging.
+    validations:
+      required: true
+  - type: checkboxes
+    id: ownership
+    attributes:
+      label: Surface ownership
+      options:
+        - label: I confirmed this belongs in the model-provider extension rather than VS Code, GitHub Copilot, or Codex CLI.
+          required: true

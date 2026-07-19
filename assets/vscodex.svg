@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>CodexVS</title>
+  <path fill="#0b1220" d="M64 16h128c26.51 0 48 21.49 48 48v128c0 26.51-21.49 48-48 48H64c-26.51 0-48-21.49-48-48V64c0-26.51 21.49-48 48-48Z"/>
+  <path fill="none" stroke="#22d3ee" stroke-linecap="round" stroke-width="20" d="M76 84c46 0 58 88 104 88"/>
+  <circle cx="76" cy="84" r="28" fill="#0b1220" stroke="#67e8f9" stroke-width="14"/>
+  <circle cx="180" cy="172" r="28" fill="#0b1220" stroke="#67e8f9" stroke-width="14"/>
+  <circle cx="76" cy="84" r="7" fill="#ecfeff"/>
+  <circle cx="180" cy="172" r="7" fill="#ecfeff"/>
+</svg>
